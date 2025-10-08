@@ -131,6 +131,8 @@
                 <p class="text-md text-gray-400 mt-2">موقع الشرطة الرسمي</p>
             </div>
             <nav id="nav-menu" class="space-y-2">
+                <!-- تم إزالة الرقم (0.) -->
+                <a href="#home" class="nav-link"><i data-lucide="home"></i>الصفحة الرئيسية</a>
                 <a href="#comprehensive-guide" class="nav-link"><i data-lucide="book-open"></i>1. الدليل الشامل</a>
                 <a href="#practical-training" class="nav-link"><i data-lucide="monitor-play"></i>2. قسم التدريب العملي</a>
                 <a href="#laws" class="nav-link"><i data-lucide="scale"></i>3. القوانين</a>
@@ -155,10 +157,31 @@
                 </button>
             </div>
             
-            <!-- تم إزالة حقل البحث (Search Bar) من هنا -->
-            
             <div id="content-area">
-                <!-- All sections will be dynamically loaded here -->
+                <!-- 0. الصفحة الرئيسية (Default Landing Page) -->
+                <section id="home" class="content-section">
+                    <!-- تم تقسيم العنوان لتلوين كلمة "ريج" -->
+                    <h1 class="main-title text-5xl font-extrabold pb-3 mb-8">البوابة الرسمية لشرطة مقاطعة <span style="color: #967959;">ريج</span></h1>
+                    <div class="glass-ui p-8 rounded-2xl text-center flex flex-col items-center justify-center min-h-[50vh]">
+                        <i data-lucide="shield" class="w-24 h-24 text-blue-500 mb-6 drop-shadow-lg"></i>
+                        <p class="text-3xl font-bold text-white mb-4">مرحباً بك أيها الشرطي، أنت في قلب العمل!</p>
+                        <p class="text-xl text-gray-300 max-w-4xl leading-relaxed">
+                            هذا هو الموقع الرسمي والوحيد التابع لإدارة شرطة مقاطعة ريج. 
+                            يُعد هذا الدليل الإلكتروني هو مرجعك الشامل لكل ما تحتاجه كفرد أمن، 
+                            من القوانين والأنظمة، إلى بروتوكولات الراديو، وشروط الترقيات، ومقاطع التدريب العملي. 
+                            <br class="hidden md:block">
+                            هدفنا هو ضمان الاحترافية القصوى والتنسيق الكامل في جميع المهام الميدانية. 
+                            <span class="text-blue-400 font-semibold">استخدم القائمة الجانبية للتنقل بين الأقسام.</span>
+                        </p>
+                        <div class="mt-8">
+                            <a href="#comprehensive-guide" class="action-button inline-block bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-bold py-3 px-8 rounded-lg text-lg hover:from-blue-700 hover:to-indigo-800 transition duration-300">
+                                <i data-lucide="arrow-left" class="inline-block w-6 h-6 ml-2"></i> البدء بالدليل الشامل
+                            </a>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 1. الدليل الشامل -->
                 <section id="comprehensive-guide" class="content-section">
                     <h1 class="main-title text-5xl font-extrabold pb-3 mb-8">الدليل الشامل للأمن العام</h1>
                     <div class="glass-ui p-8 rounded-2xl text-center">
@@ -168,6 +191,8 @@
                         <p class="mt-6 text-sm text-gray-500">هذه الطريقة تضمن أنك تحصل دائمًا على أحدث نسخة من الدليل مباشرة من القيادة.</p>
                     </div>
                 </section>
+                
+                <!-- 2. قسم التدريب العملي -->
                 <section id="practical-training" class="content-section">
                      <h1 class="main-title text-5xl font-extrabold pb-3 mb-8">قسم التدريب العملي</h1>
                     <div class="space-y-6">
@@ -191,6 +216,8 @@
                         <div class="glass-ui p-6 rounded-2xl"><h3 class="text-2xl font-semibold text-blue-400">1-6 الالية المتبعة في الاستنفارات الامنية و حالات الاختطاف</h3></div>
                     </div>
                 </section>
+
+                <!-- 3. القوانين -->
                 <section id="laws" class="content-section">
                     <h1 class="main-title text-5xl font-extrabold pb-3 mb-8">القوانين</h1>
                     <div class="glass-ui p-8 rounded-2xl">
@@ -225,6 +252,8 @@
                         </ul>
                     </div>
                 </section>
+
+                <!-- 4. المحظورات -->
                 <section id="prohibitions" class="content-section">
                     <h1 class="main-title text-5xl font-extrabold pb-3 mb-8">المحظورات</h1>
                     <div class="glass-ui p-8 rounded-2xl">
@@ -249,6 +278,8 @@
                         </ul>
                     </div>
                 </section>
+
+                <!-- 5. جدول الأمن العام -->
                 <section id="official-schedule" class="content-section">
                     <h1 class="main-title text-5xl font-extrabold pb-3 mb-8">جدول الأمن العام</h1>
                     <div class="glass-ui p-8 rounded-2xl text-center">
@@ -257,6 +288,8 @@
                         <p class="mt-6 text-sm text-gray-500">يتم تحديث هذا الجدول بشكل دوري من قبل القيادة.</p>
                     </div>
                 </section>
+
+                <!-- 6. المسميات الميدانية -->
                 <section id="field-designations" class="content-section">
                     <h1 class="main-title text-5xl font-extrabold pb-3 mb-8">المسميات الميدانية</h1>
                     <div class="glass-ui p-8 rounded-2xl">
@@ -265,21 +298,55 @@
                             <div class="p-4 bg-slate-900/50 rounded-lg border border-slate-700"><h3 class="text-xl font-bold text-blue-400">درع:</h3><p class="mr-4 text-gray-300">هو مشرف من رتبة رائد فما فوق و يكون المسؤول عن جميع المشرفين الضباط (رعد / برق).</p></div>
                             <div class="p-4 bg-slate-900/50 rounded-lg border border-slate-700"><h3 class="text-xl font-bold text-blue-400">رعد:</h3><p class="mr-4 text-gray-300">يعتبر هو الضابط المسؤول عن الميدان كامل في لوس سانتوس.</p></div>
                             <div class="p-4 bg-slate-900/50 rounded-lg border border-slate-700"><h3 class="text-xl font-bold text-blue-400">برق:</h3><p class="mr-4 text-gray-300">يعتبر هو الضابط المسؤول عن الميدان كامل في ساندي و بليتو.</p></div>
-                            <div class="p-4 bg-slate-900/50 rounded-lg border border-slate-700"><h3 class="text-xl font-bold text-blue-400">لام 10:</h3><p class="mr-4 text-gray-300">ضابط منطقة رقيب لام 1 مسؤول عن جميع افراد منطقته من لام 11 الى لام 19.</p></div>
-                            <div class="p-4 bg-slate-900/50 rounded-lg border border-slate-700"><h3 class="text-xl font-bold text-blue-400">لام 20:</h3><p class="mr-4 text-gray-300">ضابط منطقة رقيب لام 2 مسؤول عن جميع افراد منطقته من لام 21 الى لام 29.</p></div>
-                            <div class="p-4 bg-slate-900/50 rounded-lg border border-slate-700"><h3 class="text-xl font-bold text-blue-400">لام 30:</h3><p class="mr-4 text-gray-300">ضابط منطقة رقيب لام 3 مسؤول عن جميع افراد منطقته من لام 31 الى لام 39.</p></div>
-                            <div class="p-4 bg-slate-900/50 rounded-lg border border-slate-700"><h3 class="text-xl font-bold text-blue-400">لام 40:</h3><p class="mr-4 text-gray-300">ضابط منطقة رقيب لام 4 مسؤول عن جميع افراد منطقته من لام 41 الى لام 49.</p></div>
-                            <div class="p-4 bg-slate-900/50 rounded-lg border border-slate-700"><h3 class="text-xl font-bold text-blue-400">لام 50:</h3><p class="mr-4 text-gray-300">ضابط منطقة رقيب لام 5 مسؤول عن جميع افراد منطقته من لام 51 الى لام 59.</p></div>
+                            <!-- تم تعديل وصف لام 10 -->
+                            <div class="p-4 bg-slate-900/50 rounded-lg border border-slate-700"><h3 class="text-xl font-bold text-blue-400">لام 10:</h3><p class="mr-4 text-gray-300">مسؤول منطقة من رتبة رقيب فما أعلى مسؤول عن جميع أفراد منطقة اللام (1).</p></div>
+                            <!-- تم تعديل وصف لام 20 -->
+                            <div class="p-4 bg-slate-900/50 rounded-lg border border-slate-700"><h3 class="text-xl font-bold text-blue-400">لام 20:</h3><p class="mr-4 text-gray-300">مسؤول منطقة من رتبة رقيب فما أعلى مسؤول عن جميع أفراد منطقة اللام (2).</p></div>
+                            <!-- تم تعديل وصف لام 30 -->
+                            <div class="p-4 bg-slate-900/50 rounded-lg border border-slate-700"><h3 class="text-xl font-bold text-blue-400">لام 30:</h3><p class="mr-4 text-gray-300">مسؤول منطقة من رتبة رقيب فما أعلى مسؤول عن جميع أفراد منطقة اللام (3).</p></div>
+                            <!-- تم تعديل وصف لام 40 -->
+                            <div class="p-4 bg-slate-900/50 rounded-lg border border-slate-700"><h3 class="text-xl font-bold text-blue-400">لام 40:</h3><p class="mr-4 text-gray-300">مسؤول منطقة من رتبة رقيب فما أعلى مسؤول عن جميع أفراد منطقة اللام (4).</p></div>
+                            <!-- تم تعديل وصف لام 50 -->
+                            <div class="p-4 bg-slate-900/50 rounded-lg border border-slate-700"><h3 class="text-xl font-bold text-blue-400">لام 50:</h3><p class="mr-4 text-gray-300">مسؤول منطقة من رتبة رقيب فما أعلى مسؤول عن جميع أفراد منطقة اللام (5).</p></div>
                         </div>
                     </div>
                 </section>
+
+                <!-- 7. بروتوكولات الراديو -->
                 <section id="radio-protocols" class="content-section">
                     <h1 class="main-title text-5xl font-extrabold pb-3 mb-8">بروتوكولات الراديو</h1>
                     <div class="glass-ui p-8 rounded-2xl space-y-8">
                         <div><h3 class="text-2xl font-semibold mb-3 text-blue-400">قواعد التواصل الأساسية</h3><ul class="list-disc list-inside space-y-3 text-gray-300"><li>يجب التعامل مع الراديو بجدية واحترافية، مع اختصار البلاغات قدر الإمكان دون التأثير على مضمونها.</li><li>يمنع منعاً باتاً مقاطعة البلاغات الجارية.</li><li>يمنع التوجه للحالات دون توجيه من مركز العمليات. (يستثنى من ذلك المشرفون الميدانيون "رعد" و "درع").</li><li>في حال عدم استجابة العمليات، يسمح بالتوجه للحالة مع ضرورة التبليغ فوراً عبر الراديو.</li><li>يجب الاستجابة لجميع توجيهات العمليات دون نقاش أو رفض.</li><li>يمنع النقاش في الراديو؛ أي نقاشات جانبية تتم في أقرب مركز شرطة.</li><li>عند تولي أي فرد مسؤولية العمليات، يجب عليه تعيين نائب له يكون مسؤولاً عن تسجيل الوحدات.</li></ul></div>
-                        <div><h3 class="text-2xl font-semibold mb-4 text-blue-400">الأكواد المعتمدة</h3><div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 text-gray-200"><div class="space-y-2"><p class="font-bold text-lg border-b border-gray-600 pb-1 mb-2">الأكواد العامة:</p><p>🔹 <strong>كود 1:</strong> الموقع آمن أو انتهاء الحالة</p><p>🔹 <strong>كود 2:</strong> الموقع غير آمن / اشتباه</p><p>🔹 <strong>كود 3:</strong> احتياج دعم بالموقع</p><p>🔹 <strong>كود 4:</strong> حالة إطلاق نار واحتياج دعم فوري</p><p>🔹 <strong>كود 5:</strong> بلاغ سرقة متجر</p><p>🔹 <strong>كود 6:</strong> بلاغ سرقة بنك أو متحف</p><p>🔹 <strong>كود 7:</strong> أحتاج راحة</p><p>🔹 <strong>كود 8:</strong> تسجيل دخول بالراديو</p><p>🔹 <strong>كود 9:</strong> تسجيل خروج من الراديو</p><p>🔹 <strong>كود 10:</strong> الخروج من الموجه للتوجه لموجه اخرى</p></div><div class="space-y-6"><div class="space-y-2"><p class="font-bold text-lg border-b border-gray-600 pb-1 mb-2">أكواد الحالات:</p><p>🔹 <strong>حالة 1:</strong> بلاغ مطاردة مركبة لسبب مروري</p><p>🔹 <strong>حالة 2:</strong> بلاغ مطاردة مركبة لسبب جنائي</p><p>🔹 <strong>حالة 3:</strong> بلاغ عن إطلاق نار</p></div><div class="space-y-2"><p class="font-bold text-lg border-b border-gray-600 pb-1 mb-2">الغفوات (كود 7):</p><p>⏱️ <strong>غفوة قصيرة (5 دقائق):</strong> كود 7 (قصيرة)</p><p>⏱️ <strong>غفوة مطولة (10 دقائق):</strong> كود 7 (مطولة)</p></div></div></div></div>
+                        <div><h3 class="text-2xl font-semibold mb-4 text-blue-400">الأكواد المعتمدة</h3><div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 text-gray-200">
+                            <!-- تم تعديل قائمة الأكواد العامة -->
+                            <div class="space-y-2">
+                                <p class="font-bold text-lg border-b border-gray-600 pb-1 mb-2">الأكواد العامة:</p>
+                                <p>🔹 <strong>كود 1:</strong> الموقع آمن أو انتهاء الحالة</p>
+                                <p>🔹 <strong>كود 2:</strong> الموقع غير آمن / اشتباه</p>
+                                <p>🔹 <strong>كود 3:</strong> احتياج دعم بالموقع</p>
+                                <p>🔹 <strong>كود 4:</strong> حالة إطلاق نار واحتياج دعم فوري</p>
+                                <p>🔹 <strong>كود 5:</strong> بلاغ سرقة متجر</p>
+                                <p>🔹 <strong>كود 6:</strong> بلاغ سرقة بنك أو متحف</p>
+                                <!-- تم تعديل كود 7 -->
+                                <p>🔹 <strong>كود 7:</strong> أحتاج راحة <span class="text-red-500 font-semibold">(يمنع أخذ راحة أكثر من 10 د)</span></p>
+                                <p>🔹 <strong>كود 8:</strong> تسجيل دخول بالراديو</p>
+                                <p>🔹 <strong>كود 9:</strong> تسجيل خروج من الراديو</p>
+                                <p>🔹 <strong>كود 10:</strong> الخروج من الموجه للتوجه لموجه اخرى</p>
+                            </div>
+                            <!-- تم تصحيح حالة 3 هنا -->
+                            <div class="space-y-6">
+                                <div class="space-y-2">
+                                    <p class="font-bold text-lg border-b border-gray-600 pb-1 mb-2">أكواد الحالات:</p>
+                                    <p>🔹 <strong>حالة 1:</strong> بلاغ مطاردة مركبة لسبب مروري</p>
+                                    <p>🔹 <strong>حالة 2:</strong> بلاغ مطاردة مركبة لسبب جنائي</p>
+                                    <p>🔹 <strong>حالة 3:</strong> بلاغ عن إطلاق نار</p>
+                                </div>
+                            </div>
+                        </div></div>
                     </div>
                 </section>
+
+                <!-- 8. موجات الراديو -->
                 <section id="radio-waves" class="content-section">
                      <h1 class="main-title text-5xl font-extrabold pb-3 mb-8">موجات الراديو</h1>
                      <div class="glass-ui p-8 rounded-2xl">
@@ -301,6 +368,8 @@
                         </div>
                      </div>
                 </section>
+
+                <!-- 9. شروط الترقيات -->
                 <section id="promotion-conditions" class="content-section">
                     <h1 class="main-title text-5xl font-extrabold pb-3 mb-8">شروط الترقيات</h1>
                     <div class="glass-ui p-8 rounded-2xl text-center">
@@ -312,6 +381,8 @@
                         <p class="mt-8 text-sm text-gray-500">تُحدّث هذه الجداول مباشرة من قبل القيادة لضمان دقة المعلومات.</p>
                     </div>
                 </section>
+
+                <!-- 10. المركبات العسكرية -->
             <section id="military-vehicles" class="content-section">
                 <h1 class="main-title text-5xl font-extrabold pb-3 mb-8">المركبات العسكرية</h1>
                 <div class="glass-ui p-10 rounded-2xl text-center">
@@ -320,6 +391,8 @@
                     <p class="text-xl text-gray-300 mt-3">المركبات المصرحة لرتبتك سوف تظهر لك بشكل تلقائي في معرض الوكالة.</p>
                 </div>
             </section>
+
+            <!-- 11. قسم الدورات العسكرية -->
             <section id="military-courses" class="content-section">
                 <h1 class="main-title text-5xl font-extrabold pb-3 mb-8">قسم الدورات العسكرية</h1>
                 <div class="glass-ui p-8 rounded-2xl">
@@ -328,8 +401,14 @@
                         <a href="https://drive.google.com/file/d/1Ygxt3yIKTpi6wdgvkmgqbCsZpKfMph-D/view" target="_blank" class="action-button flex flex-col items-center justify-center text-center p-6 bg-slate-800/70 border border-slate-700 rounded-lg"><i data-lucide="headphones" class="h-16 w-16 mb-2 text-blue-400"></i><h3 class="text-2xl font-bold">دورة العمليات</h3></a>
                         <a href="https://drive.google.com/file/d/1BSJfqIMORlywEs1HmzPR7KV7NDVDEdhV/view" target="_blank" class="action-button flex flex-col items-center justify-center text-center p-6 bg-slate-800/70 border border-slate-700 rounded-lg"><i data-lucide="traffic-cone" class="h-16 w-16 mb-2 text-blue-400"></i><h3 class="text-2xl font-bold">دورة المرور و امن الطرق</h3></a>
                         <a href="https://drive.google.com/file/d/1U84Y9lx_odQm1NuD_VNia3dGuymP3cdy/view" target="_blank" class="action-button flex flex-col items-center justify-center text-center p-6 bg-slate-800/70 border border-slate-700 rounded-lg"><i data-lucide="plane" class="h-16 w-16 mb-2 text-blue-400"></i><h3 class="text-2xl font-bold">دورة الجناح الجوي</h3></a>
-                        <!-- تم تغيير الأيقونة هنا من shield-plus إلى star -->
+                        
+                        <!-- تم نقل الدورة الجديدة هنا -->
+                        <a href="https://docs.google.com/document/d/15Qs-QPNPBiHrEEJu2kUuPa2WV4cEyafA7Ay35M8hBzg/edit?tab=t.0" target="_blank" class="action-button flex flex-col items-center justify-center text-center p-6 bg-slate-800/70 border border-slate-700 rounded-lg"><i data-lucide="sword" class="h-16 w-16 mb-2 text-blue-400"></i><h3 class="text-2xl font-bold">دورة المهام و الواجبات الخاصة</h3></a>
+                        
+                        <!-- دورة تأهيل الضباط تأتي الآن بعد الدورة الجديدة -->
                         <a href="https://drive.google.com/file/d/1dDNOGohpBclkiMqnJhgcnSo5Ado83a68/view" target="_blank" class="action-button flex flex-col items-center justify-center text-center p-6 bg-slate-800/70 border border-slate-700 rounded-lg"><i data-lucide="star" class="h-16 w-16 mb-2 text-blue-400"></i><h3 class="text-2xl font-bold">دورة تأهيل الضباط</h3></a>
+                        
+
                         <a href="https://drive.google.com/file/d/1_iJpC9uhvy9HlRWa_5b8w7j0INh55HZN/view" target="_blank" class="action-button flex flex-col items-center justify-center text-center p-6 bg-slate-800/70 border border-slate-700 rounded-lg md:col-start-2 lg:col-start-auto"><i data-lucide="user-plus" class="h-16 w-16 mb-2 text-blue-400"></i><h3 class="text-2xl font-bold">شؤون التجنيد</h3></a>
                     </div>
                 </div>
@@ -347,14 +426,9 @@
             const menuToggle = document.getElementById('menu-toggle');
             const sidebar = document.getElementById('sidebar');
             
-            // تم إزالة تعريفات عناصر البحث
-
             // 1. Navigation Logic
             // ===================================
             function navigateToSection(hash) {
-                // تم إزالة وظائف تنظيف البحث هنا
-
-
                 contentSections.forEach(section => section.classList.remove('active'));
                 navLinks.forEach(link => link.classList.remove('active'));
                 
@@ -379,11 +453,12 @@
             });
             
             window.addEventListener('popstate', () => {
-                const hash = window.location.hash || '#comprehensive-guide';
+                const hash = window.location.hash || '#home'; // تم تغيير الافتراضي إلى #home
                  navigateToSection(hash);
             });
 
-            const initialHash = window.location.hash || '#comprehensive-guide';
+            // تعيين الصفحة الرئيسية كقسم افتراضي
+            const initialHash = window.location.hash || '#home'; 
             navigateToSection(initialHash);
 
             menuToggle.addEventListener('click', () => {
@@ -391,13 +466,7 @@
             });
 
 
-            // 2. Search Logic (Removed)
-            // ===================================
-            // تم إزالة جميع الدوال الخاصة بالبحث (performSearch, createSnippet, highlightText, removeHighlights) 
-            // وتم إزالة مستمعي الأحداث (Event Listeners) المتعلقة بالبحث.
-
-
-            // 3. Interactive Background Logic (Original Code)
+            // 2. Interactive Background Logic (Original Code)
             // ===================================
             const canvas = document.getElementById('background-canvas');
             const ctx = canvas.getContext('2d');
@@ -493,9 +562,9 @@
 
                 // Draw mouse light (soft focus on content)
                 if (mouse.x && mouse.y) {
-                    const gradient = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 250);
-                    // Increased opacity slightly for better focus
-                    gradient.addColorStop(0, 'rgba(255, 255, 255, 0.05)'); 
+                    const gradient = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 100); // تم تقليل الحجم إلى 100
+                    // تم تقليل الشفافية إلى 0.02 لتخفيف السطوع
+                    gradient.addColorStop(0, 'rgba(255, 255, 255, 0.02)'); 
                     gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
                     ctx.fillStyle = gradient;
                     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -534,4 +603,3 @@
 
 </body>
 </html>
-

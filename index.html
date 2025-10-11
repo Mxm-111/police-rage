@@ -4,20 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>إدارة شرطة ريج | البوابة الرسمية</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Preconnect to external domains for faster loading -->
+    <link rel="preconnect" href="https://prod.spline.design" crossorigin>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com" crossorigin>
+
+    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
-    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
             --bg-color: #000000;
-            --sidebar-color: rgba(13, 17, 23, 0.5); /* زيادة طفيفة في الشفافية */
-            --card-color: rgba(22, 27, 34, 0.6);   /* زيادة طفيفة في الشفافية */
-            --border-color: rgba(48, 54, 61, 0.5); 
+            --card-color: rgba(10, 15, 25, 0.6);
+            --border-color: rgba(56, 139, 253, 0.3);
             --accent-color: #388bfd;
-            --accent-glow: rgba(56, 139, 253, 0.4);
+            --accent-glow: rgba(56, 139, 253, 0.5);
             --text-color: #c9d1d9;
             --text-heading: #f0f6fc;
         }
@@ -26,630 +29,519 @@
             font-family: 'Tajawal', sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
-            overflow-x: hidden;
+            overflow: hidden;
         }
         
-        #background-canvas {
+        #spline-background {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 0;
+            z-index: 1;
+            border: none;
+            background: var(--bg-color); 
+            transition: filter 0.5s ease-in-out, transform 0.5s ease-in-out;
         }
 
-        .glass-ui {
-            background-color: var(--card-color);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--border-color);
-            transition: all 0.3s ease;
+        #spline-background.blurry {
+            filter: blur(10px) brightness(0.6);
+            transform: scale(1.05);
         }
         
-        .sidebar {
-            background-color: var(--sidebar-color);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-left: 1px solid var(--border-color);
+        .spline-watermark-cover {
+            position: fixed;
+            bottom: -5px;
+            right: -5px;
+            width: 200px;
+            height: 60px;
+            background-color: var(--bg-color);
+            z-index: 5;
+            pointer-events: none;
         }
 
-        .nav-link {
+        #main-interface {
             position: relative;
-            transition: all 0.2s ease-in-out;
-            padding: 12px 16px;
-            border-radius: 8px;
-            color: var(--text-color);
-            font-weight: 500;
-            display: flex; /* لدمج أيقونات Lucide */
+            z-index: 10;
+            height: 100vh;
+            width: 100vw;
+            pointer-events: none;
+        }
+
+        #main-interface > * {
+            pointer-events: auto;
+        }
+
+        .nav-node {
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            border: 2px solid var(--border-color);
+            border-radius: 50%;
+            display: flex;
             align-items: center;
-        }
-        .nav-link svg {
-            margin-left: 10px;
-        }
-
-
-        .nav-link:hover {
-            background-color: rgba(56, 139, 253, 0.1);
-            color: var(--accent-color);
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: rgba(13, 17, 23, 0.4);
+            backdrop-filter: blur(5px);
+            animation: float 6s ease-in-out infinite;
         }
 
-        .nav-link.active {
-            background-color: var(--accent-color);
-            color: white !important;
-            font-weight: 700;
-            box-shadow: 0 0 15px var(--accent-glow);
+        .nav-node:hover {
+            transform: scale(1.15);
+            background-color: rgba(56, 139, 253, 0.2);
+            border-color: var(--accent-color);
+            box-shadow: 0 0 25px var(--accent-glow);
+        }
+
+        .nav-node .node-label {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            padding: 5px 15px;
+            background-color: var(--bg-color);
+            color: var(--text-heading);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            white-space: nowrap;
+            opacity: 1;
+            visibility: visible;
+            pointer-events: none;
+            text-shadow: 0 0 6px var(--bg-color);
         }
         
-        .content-section {
-            display: none;
-            animation: fadeIn 0.5s ease-out;
+        .nav-node.left-side .node-label { right: 110%; }
+        .nav-node.right-side .node-label { left: 110%; }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(15px); }
-            to { opacity: 1; transform: translateY(0); }
+        #node-1 { top: 15%; left: 20%; animation-delay: 0s; }
+        #node-2 { top: 30%; left: 12%; animation-delay: -1s; }
+        #node-3 { top: 45%; left: 20%; animation-delay: -2s; }
+        #node-4 { top: 60%; left: 12%; animation-delay: -3s; }
+        #node-5 { top: 75%; left: 20%; animation-delay: -4s; }
+        #node-6 { top: 90%; left: 12%; animation-delay: -5s; }
+        
+        #node-7 { top: 15%; right: 20%; animation-delay: -0.5s; }
+        #node-8 { top: 30%; right: 12%; animation-delay: -1.5s; }
+        #node-9 { top: 45%; right: 20%; animation-delay: -2.5s; }
+        #node-10 { top: 60%; right: 12%; animation-delay: -3.5s; }
+        #node-11 { top: 75%; right: 20%; animation-delay: -4.5s; }
+        #node-12 { top: 90%; right: 12%; animation-delay: -5.5s; }
+        
+        #content-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 20;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+        }
+        #content-overlay.visible {
+            opacity: 1;
+            visibility: visible;
         }
 
-        .content-section.active { display: block; }
+        #content-card {
+            background-color: var(--card-color);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 1000px;
+            height: 85vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+            transform: scale(0.9);
+            transition: transform 0.4s ease;
+        }
+        #content-overlay.visible #content-card {
+            transform: scale(1);
+        }
 
+        #card-body {
+            padding: 20px 30px;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+        
+        #close-content-btn {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            padding: 8px;
+            transition: background 0.2s;
+            z-index: 25;
+        }
+        #close-content-btn:hover { background: rgba(255,255,255,0.2); }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent-color); }
+        
         .main-title {
             color: var(--text-heading);
             border-bottom: 2px solid var(--accent-color);
             text-shadow: 0 0 10px var(--accent-glow);
         }
 
-        .action-button {
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-        }
-        .action-button:hover {
-            transform: scale(1.03); /* تعديل طفيف للحجم */
-            box-shadow: 0 10px 30px var(--accent-glow);
+        @media (max-width: 768px) {
+            .nav-node {
+                width: 50px;
+                height: 50px;
+            }
+            .nav-node svg {
+                width: 24px;
+                height: 24px;
+            }
+            #node-1, #node-3, #node-5 { left: 15%; }
+            #node-2, #node-4, #node-6 { left: 5%; }
+            #node-7, #node-9, #node-11 { right: 15%; }
+            #node-8, #node-10, #node-12 { right: 5%; }
+            
+            #node-1, #node-7 { top: 12%; }
+            #node-2, #node-8 { top: 28%; }
+            #node-3, #node-9 { top: 44%; }
+            #node-4, #node-10 { top: 60%; }
+            #node-5, #node-11 { top: 76%; }
+            #node-6, #node-12 { top: 92%; }
+            
+            .nav-node .node-label {
+                font-size: 0.7rem;
+                padding: 2px 8px;
+            }
+            .nav-node.left-side .node-label { right: 105%; }
+            .nav-node.right-side .node-label { left: 105%; }
+
+            #content-card {
+                width: 95%;
+                height: 90vh;
+            }
+            #card-body {
+                padding: 15px;
+            }
         }
 
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--accent-color); }
-
-        /* Style for videos on desktop */
-        .video-container {
-            /* This is a placeholder as the styling is now directly applied with Tailwind classes on the video element's parent in the HTML structure. */
-        }
     </style>
 </head>
-<body class="text-gray-200">
+<body>
     
-    <canvas id="background-canvas"></canvas>
+    <iframe id="spline-background" src='https://my.spline.design/nexbotrobotcharacterconcept-1BsNTQMVnhlQ5SN7jKmSIZgI/' fetchpriority="high"></iframe>
+    <div class="spline-watermark-cover"></div>
 
-    <div class="flex min-h-screen relative z-10">
-        <!-- Sidebar Navigation -->
-        <aside id="sidebar" class="sidebar w-64 space-y-2 py-7 px-4 fixed inset-y-0 right-0 transform translate-x-full md:relative md:translate-x-0 transition-transform duration-300 ease-in-out z-30">
-            <div class="px-4 mb-8 text-center">
-                <h2 class="text-3xl font-extrabold"><span class="text-white">مقاطعة</span> <span style="color: #967959;">ريج</span></h2>
-                <p class="text-md text-gray-400 mt-2">موقع الشرطة الرسمي</p>
-            </div>
-            <nav id="nav-menu" class="space-y-2">
-                <!-- تم إزالة الرقم (0.) -->
-                <a href="#home" class="nav-link"><i data-lucide="home"></i>الصفحة الرئيسية</a>
-                <a href="#comprehensive-guide" class="nav-link"><i data-lucide="book-open"></i>1. الدليل الشامل</a>
-                <a href="#practical-training" class="nav-link"><i data-lucide="monitor-play"></i>2. قسم التدريب العملي</a>
-                <a href="#laws" class="nav-link"><i data-lucide="scale"></i>3. القوانين</a>
-                <a href="#prohibitions" class="nav-link"><i data-lucide="ban"></i>4. المحظورات</a>
-                <a href="#official-schedule" class="nav-link"><i data-lucide="calendar"></i>5. جدول الأمن العام</a>
-                <a href="#field-designations" class="nav-link"><i data-lucide="award"></i>6. المسميات الميدانية</a>
-                <a href="#radio-protocols" class="nav-link"><i data-lucide="radio"></i>7. بروتوكولات الراديو</a>
-                <a href="#radio-waves" class="nav-link"><i data-lucide="list-music"></i>8. موجات الراديو</a>
-                <a href="#promotion-conditions" class="nav-link"><i data-lucide="trending-up"></i>9. شروط الترقيات</a>
-                <a href="#military-vehicles" class="nav-link"><i data-lucide="car"></i>10. المركبات العسكرية</a>
-                <a href="#military-courses" class="nav-link"><i data-lucide="graduation-cap"></i>11. قسم الدورات العسكرية</a>
-            </nav>
-        </aside>
+    <main id="main-interface">
+        <header class="absolute top-0 left-1/2 -translate-x-1/2 p-6 text-center w-full max-w-lg">
+             <h1 class="text-3xl md:text-5xl font-extrabold text-shadow-lg"><span class="text-white">بوابة شرطة</span> <span style="color: #967959;">ريج</span></h1>
+             <p class="text-md md:text-lg text-gray-300 mt-2">مرجعك التفاعلي للأمن والنظام</p>
+        </header>
 
-        <!-- Main Content -->
-        <main class="flex-1 p-5 md:p-10">
-            <!-- Header for mobile -->
-            <div class="md:hidden flex justify-between items-center mb-6">
-                <h1 class="text-2xl font-bold text-white">البوابة الرسمية</h1>
-                <button id="menu-toggle" class="text-white focus:outline-none p-2 rounded-lg glass-ui">
-                    <i data-lucide="menu" class="w-8 h-8"></i>
-                </button>
-            </div>
+        <nav id="navigation-nodes">
+            <!-- Left Side -->
+            <a href="#official-schedule" class="nav-node left-side" id="node-1"><i data-lucide="calendar"></i><span class="node-label">جدول الامن العام</span></a>
+            <a href="#promotion-conditions" class="nav-node left-side" id="node-2"><i data-lucide="trending-up"></i><span class="node-label">شروط الترقيات</span></a>
+            <a href="#field-designations" class="nav-node left-side" id="node-3"><i data-lucide="award"></i><span class="node-label">المسميات الميدانية</span></a>
+            <a href="#radio-protocols" class="nav-node left-side" id="node-4"><i data-lucide="radio"></i><span class="node-label">بروتوكولات الراديو</span></a>
+            <a href="#radio-waves" class="nav-node left-side" id="node-5"><i data-lucide="list-music"></i><span class="node-label">موجات الراديو</span></a>
+            <a href="#military-vehicles" class="nav-node left-side" id="node-6"><i data-lucide="car"></i><span class="node-label">المركبات العسكرية</span></a>
             
-            <div id="content-area">
-                <!-- 0. الصفحة الرئيسية (Default Landing Page) -->
-                <section id="home" class="content-section">
-                    <!-- تم تقسيم العنوان لتلوين كلمة "ريج" -->
-                    <h1 class="main-title text-5xl font-extrabold pb-3 mb-8">البوابة الرسمية لشرطة مقاطعة <span style="color: #967959;">ريج</span></h1>
-                    <div class="glass-ui p-8 rounded-2xl text-center flex flex-col items-center justify-center min-h-[50vh]">
-                        <i data-lucide="shield" class="w-24 h-24 text-blue-500 mb-6 drop-shadow-lg"></i>
-                        <p class="text-3xl font-bold text-white mb-4">مرحباً بك أيها الشرطي، أنت في قلب العمل!</p>
-                        <p class="text-xl text-gray-300 max-w-4xl leading-relaxed">
-                            هذا هو الموقع الرسمي والوحيد التابع لإدارة شرطة مقاطعة ريج. 
-                            يُعد هذا الدليل الإلكتروني هو مرجعك الشامل لكل ما تحتاجه كفرد أمن، 
-                            من القوانين والأنظمة، إلى بروتوكولات الراديو، وشروط الترقيات، ومقاطع التدريب العملي. 
-                            <br class="hidden md:block">
-                            هدفنا هو ضمان الاحترافية القصوى والتنسيق الكامل في جميع المهام الميدانية. 
-                        </p>
-                        <p class="text-blue-400 font-semibold text-xl mt-6">استخدم القائمة الجانبية للتنقل بين الأقسام.</p>
-                        <div class="mt-8">
-                            <a href="#comprehensive-guide" class="action-button inline-block bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-bold py-3 px-8 rounded-lg text-lg hover:from-blue-700 hover:to-indigo-800 transition duration-300">
-                                <i data-lucide="arrow-left" class="inline-block w-6 h-6 ml-2"></i> البدء بالدليل الشامل
-                            </a>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- 1. الدليل الشامل -->
-                <section id="comprehensive-guide" class="content-section">
-                    <h1 class="main-title text-5xl font-extrabold pb-3 mb-8">الدليل الشامل للأمن العام</h1>
-                    <div class="glass-ui p-8 rounded-2xl text-center">
-                        <p class="text-xl text-gray-300 mb-8">لعرض الدليل الشامل والمحدث دائماً، يرجى الضغط على الرابط أدناه. سيتم فتح المستند الرسمي في نافذة جديدة.</p>
-                        <!-- تم تحديث الرابط هنا -->
-                        <a href="https://docs.google.com/document/d/19_SX1exwSlyebgRaddjGHV9Oc0oYwCjX4TaWJxsRyOE/edit?tab=t.0" target="_blank" class="action-button inline-block bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold py-4 px-10 rounded-lg text-xl"><i data-lucide="external-link" class="inline-block w-8 h-8 ml-3"></i>فتح الدليل الشامل</a>
-                        <p class="mt-6 text-sm text-gray-500">هذه الطريقة تضمن أنك تحصل دائمًا على أحدث نسخة من الدليل مباشرة من القيادة.</p>
-                    </div>
-                </section>
-                
-                <!-- 2. قسم التدريب العملي -->
-                <section id="practical-training" class="content-section">
-                     <h1 class="main-title text-5xl font-extrabold pb-3 mb-8">قسم التدريب العملي</h1>
-                    <div class="space-y-6">
-                        <!-- تم تعديل جميع النقاط -->
-                        <div class="glass-ui p-6 rounded-2xl">
-                            <div class="flex justify-between items-center">
-                                <h3 class="text-2xl font-semibold text-blue-400">1-1 طريقة استعمال F6 العسكرية</h3>
-                                <span class="text-red-500 font-bold text-xl mr-4">قريبا</span>
-                            </div>
-                        </div>
-                        <div class="glass-ui p-6 rounded-2xl">
-                            <div class="flex justify-between items-center">
-                                <h3 class="text-2xl font-semibold text-blue-400">1-2 طريقة استعمال جهاز الشرطة ال MDT</h3>
-                                <span class="text-red-500 font-bold text-xl mr-4">قريبا</span>
-                            </div>
-                        </div>
-                        <div class="glass-ui p-6 rounded-2xl">
-                            <div class="flex justify-between items-center">
-                                <h3 class="text-2xl font-semibold text-blue-400">1-3 الالية المتبعة في الاستيقاف المروري و الجنائي</h3>
-                                <span class="text-red-500 font-bold text-xl mr-4">قريبا</span>
-                            </div>
-                        </div>
-                        <div class="glass-ui p-6 rounded-2xl">
-                             <div class="flex justify-between items-center">
-                                <h3 class="text-2xl font-semibold text-blue-400">1-4 الالية المتبعة في المطاردات</h3>
-                                <span class="text-red-500 font-bold text-xl mr-4">قريبا</span>
-                            </div>
-                        </div>
-                        <div class="glass-ui p-6 rounded-2xl">
-                            <div class="flex justify-between items-center">
-                                <h3 class="text-2xl font-semibold text-blue-400">1-5 طريقة التعامل مع المجرمين</h3>
-                                <span class="text-red-500 font-bold text-xl mr-4">قريبا</span>
-                            </div>
-                        </div>
-                        <div class="glass-ui p-6 rounded-2xl">
-                            <div class="flex justify-between items-center">
-                                <h3 class="text-2xl font-semibold text-blue-400">1-6 الالية المتبعة في الاستنفارات الامنية و حالات الاختطاف</h3>
-                                <span class="text-red-500 font-bold text-xl mr-4">قريبا</span>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- 3. القوانين -->
-                <section id="laws" class="content-section">
-                    <h1 class="main-title text-5xl font-extrabold pb-3 mb-8">القوانين</h1>
-                    <div class="glass-ui p-8 rounded-2xl">
-                        <h3 class="text-2xl font-semibold mb-4 text-blue-400">القوانين العامة</h3>
-                        <ul class="list-disc list-inside space-y-3 text-gray-300">
-                            <li>الالتزام باحترام القوانين والأنظمة داخل المقاطعة وعدم إساءة استخدام الصلاحيات</li>
-                            <li>الالتزام بالأوامر والتعليمات الصادرة من القيادة أو مركز العمليات</li>
-                            <li>المحافظة على صورة رجل الأمن داخل السيرفر (احترام المواطنين – التعاون – عدم الاستهتار)</li>
-                            <li>يمنع استخدام صلاحيات الشرطة لمصالح شخصية أو للتسلية</li>
-                            <li>جميع أفراد الشرطة خاضعون للمساءلة عند مخالفة التعليمات</li>
-                        </ul>
-                        <hr class="my-6 border-gray-700">
-                        <h3 class="text-2xl font-semibold my-4 text-blue-400">👮‍♂️ قوانين الأفراد</h3>
-                        <ul class="list-disc list-inside space-y-3 text-gray-300">
-                            <li>الالتزام بالزي الرسمي أثناء الدوام</li>
-                            <li>التواجد على الموجات الرسمية وتسجيل الدخول والخروج بالراديو (كود 8 / كود 9)</li>
-                            <li>يمنع التدخل في اختصاص القطاعات الأخرى إلا عند طلب الدعم</li>
-                            <li>التعامل مع البلاغات بجدية وعدم التهاون أو تجاهل النداءات</li>
-                            <li>احترام الرتب الأعلى والالتزام بسلسلة القيادة</li>
-                            <li>تنفيذ اوامر الضباط بدون نقاش وفي حال يوجد مخالفة ( نفذ بعدها اشتكي)</li>
-                            <li>يمنع مناقشة الضباط في الميدان و الاكتفاء بتسجيل مقطع ورفع شكوى</li>
-                        </ul>
-                        <hr class="my-6 border-gray-700">
-                        <h3 class="text-2xl font-semibold my-4 text-blue-400">🧑‍✈️ قوانين الضباط</h3>
-                        <ul class="list-disc list-inside space-y-3 text-gray-300">
-                            <li>متابعة انضباط الأفراد تحت قيادتهم والتأكد من التزامهم بالقوانين</li>
-                            <li>رفع تقارير دورية عن سير العمل والحالات المهمة للقيادة</li>
-                            <li>التدريب والتوجيه المستمر للأفراد الجدد</li>
-                            <li>التحلي بالمسؤولية في استخدام الصلاحيات وعدم التعسف</li>
-                            <li>أن يكونوا قدوة في الالتزام والانضباط داخل الميدان</li>
-                            <li>متابعة الافراد في الميدان بشكل كامل و متابعة الراديو</li>
-                        </ul>
-                    </div>
-                </section>
-
-                <!-- 4. المحظورات -->
-                <section id="prohibitions" class="content-section">
-                    <h1 class="main-title text-5xl font-extrabold pb-3 mb-8">المحظورات</h1>
-                    <div class="glass-ui p-8 rounded-2xl text-center border-red-500/50 bg-red-900/20">
-                        <i data-lucide="alert-triangle" class="w-20 h-20 text-red-400 mx-auto mb-4"></i>
-                        <p class="text-2xl font-bold text-red-300 mb-8">يرجى متابعة جدول العقوبات لتجنب المخالفات</p>
-                        <a href="https://docs.google.com/spreadsheets/d/1pbS3a0uXLH-Rdjknp-N480zxh9t6R-oRbDDOXM1vX88/edit?gid=360352132#gid=360352132" target="_blank" class="action-button inline-flex items-center justify-center gap-3 bg-gradient-to-r from-red-600 to-rose-700 text-white font-bold py-4 px-10 rounded-lg text-xl hover:from-red-700 hover:to-rose-800"><i data-lucide="book-warning" class="inline-block w-8 h-8"></i>فتح جدول العقوبات</a>
-                    </div>
-                </section>
-
-                <!-- 5. جدول الأمن العام -->
-                <section id="official-schedule" class="content-section">
-                    <h1 class="main-title text-5xl font-extrabold pb-3 mb-8">جدول الأمن العام</h1>
-                    <div class="glass-ui p-8 rounded-2xl text-center">
-                        <p class="text-xl text-gray-300 mb-8">للاطلاع على الجدول الرسمي لجميع أفراد الأمن العام، بما في ذلك الرتب، الدورات، والتقييمات، يرجى الضغط على الرابط أدناه.</p>
-                        <a href="https://docs.google.com/spreadsheets/d/1pbS3a0uXLH-Rdjknp-N480zxh9t6R-oRbDDOXM1vX88/edit?gid=515747649#gid=515747649" target="_blank" class="action-button inline-block bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold py-4 px-10 rounded-lg text-xl"><i data-lucide="table" class="inline-block w-8 h-8 ml-3"></i>فتح جدول الأمن العام</a>
-                        <p class="mt-6 text-sm text-gray-500">يتم تحديث هذا الجدول بشكل دوري من قبل القيادة.</p>
-                    </div>
-                </section>
-
-                <!-- 6. المسميات الميدانية -->
-                <section id="field-designations" class="content-section">
-                    <h1 class="main-title text-5xl font-extrabold pb-3 mb-8">المسميات الميدانية</h1>
-                    <div class="glass-ui p-8 rounded-2xl">
-                        <div class="space-y-10">
-                            <!-- الفئة الأولى: المشرفين الميدانين -->
-                            <div>
-                                <h2 class="text-3xl font-bold text-blue-300 mb-5 border-b-2 border-blue-800 pb-3">المشرفين الميدانين</h2>
-                                <div class="space-y-4 mt-4">
-                                    <div class="p-4 bg-slate-900/50 rounded-lg border border-slate-700"><h3 class="text-xl font-bold text-blue-400">درع</h3><p class="mr-4 text-gray-300">مشرف من رتبة مقدم فما فوق و يكون المسؤول عن جميع المشرفين الضباط رعد برق</p></div>
-                                    <div class="p-4 bg-slate-900/50 rounded-lg border border-slate-700"><h3 class="text-xl font-bold text-blue-400">رعد</h3><p class="mr-4 text-gray-300">مشرف من رتبة ملازم الى رائد و هو المسؤول عن الإشراف الكامل على رئيس الرقباء وجميع العمليات الميدانية في منطقة لوس سانتوس</p></div>
-                                    <div class="p-4 bg-slate-900/50 rounded-lg border border-slate-700"><h3 class="text-xl font-bold text-blue-400">برق</h3><p class="mr-4 text-gray-300">مشرف من رتبة ملازم الى رائد و هو المسؤول عن الإشراف الكامل على رئيس الرقباء وجميع العمليات الميدانية في منطقة ساندي و بليتو</p></div>
-                                    <div class="p-4 bg-slate-900/50 rounded-lg border border-slate-700"><h3 class="text-xl font-bold text-blue-400">رمح</h3><p class="mr-4 text-gray-300">مشرف على جميع الافراد التابعة لمنطقته لوس سانتوس او ساندي و بليتو</p></div>
-                                </div>
-                            </div>
-                             <!-- الفئة الثانية: وحدات الضباط الجانبية -->
-                            <div>
-                                <h2 class="text-3xl font-bold text-blue-300 mb-5 border-b-2 border-blue-800 pb-3">وحدات الضباط الجانبية</h2>
-                                <div class="space-y-4 mt-4">
-                                    <div class="p-4 bg-slate-900/50 rounded-lg border border-slate-700"><h3 class="text-xl font-bold text-blue-400">شمال و غرب و جنوب و شرق</h3><p class="mr-4 text-gray-300">هم ضباط من رتبة ملازم فما اعلى يسجلون في هذه المسمى في حال اكتمال الرعود و البروق</p></div>
-                                </div>
-                            </div>
-                            <!-- الفئة الثالثة: الافراد -->
-                            <div>
-                                <h2 class="text-3xl font-bold text-blue-300 mb-5 border-b-2 border-blue-800 pb-3">الافراد</h2>
-                                <div class="space-y-4 mt-4">
-                                    <div class="p-4 bg-slate-900/50 rounded-lg border border-slate-700"><h3 class="text-xl font-bold text-blue-400">L-10 الى L-19</h3><p class="mr-4 text-gray-300">الافراد التابعين لمنطقة L-01</p></div>
-                                    <div class="p-4 bg-slate-900/50 rounded-lg border border-slate-700"><h3 class="text-xl font-bold text-blue-400">L-20 الى L-29</h3><p class="mr-4 text-gray-300">الافراد التابعين لمنطقة L-02</p></div>
-                                    <div class="p-4 bg-slate-900/50 rounded-lg border border-slate-700"><h3 class="text-xl font-bold text-blue-400">L-30 الى L-39</h3><p class="mr-4 text-gray-300">الافراد التابعين لمنطقة L-03</p></div>
-                                    <div class="p-4 bg-slate-900/50 rounded-lg border border-slate-700"><h3 class="text-xl font-bold text-blue-400">L-40 الى L-49</h3><p class="mr-4 text-gray-300">الافراد التابعين لمنطقة L-04</p></div>
-                                    <div class="p-4 bg-slate-900/50 rounded-lg border border-slate-700"><h3 class="text-xl font-bold text-blue-400">L-50 الى L-59</h3><p class="mr-4 text-gray-300">الافراد التابعين لمنطقة L-05</p></div>
-                                </div>
-                            </div>
-                             <!-- الفئة الرابعة: الوحدات المتخصصة -->
-                            <div>
-                                <h2 class="text-3xl font-bold text-blue-300 mb-5 border-b-2 border-blue-800 pb-3">الوحدات المتخصصة</h2>
-                                <div class="space-y-4 mt-4">
-                                    <div class="p-4 bg-slate-900/50 rounded-lg border border-slate-700"><h3 class="text-xl font-bold text-blue-400">ميم</h3><p class="mr-4 text-gray-300">وحدات المرور التابعة لجميع المناطق</p></div>
-                                    <div class="p-4 bg-slate-900/50 rounded-lg border border-slate-700"><h3 class="text-xl font-bold text-blue-400">امن</h3><p class="mr-4 text-gray-300">وحدات امن الطرق التابعة لجميع المناطق</p></div>
-                                    <div class="p-4 bg-slate-900/50 rounded-lg border border-slate-700"><h3 class="text-xl font-bold text-blue-400">صقر</h3><p class="mr-4 text-gray-300">الوحدات الجوية حيث ان صقر 1 هو قيادة الامن العام و صقر 2 و 3 هو للافراد و الضباط التابعين لمنطقة لوس سانتوس و صقر 4 و 5 هو للافراد و الضباط لنقطة ساندي و بليتو</p></div>
-                                    <div class="p-4 bg-slate-900/50 rounded-lg border border-slate-700"><h3 class="text-xl font-bold text-blue-400">مهام</h3><p class="mr-4 text-gray-300">وحدات المهام التابعة للوس و ساندي و بليتو حيث ان مهام 1 و 2 و 3 تابعين لمنقطة لوس سانتوس و مهام 4 و 5 و 6 تابعين لمنطقة ساندي و بليتو</p></div>
-                                    <div class="p-4 bg-slate-900/50 rounded-lg border border-slate-700"><h3 class="text-xl font-bold text-blue-400">الامن الجنائي</h3><p class="mr-4 text-gray-300">وحدات البحث و التحري في جميع المناطق</p></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- 7. بروتوكولات الراديو -->
-                <section id="radio-protocols" class="content-section">
-                    <h1 class="main-title text-5xl font-extrabold pb-3 mb-8">بروتوكولات الراديو</h1>
-                    <div class="glass-ui p-8 rounded-2xl space-y-8">
-                        <div><h3 class="text-2xl font-semibold mb-3 text-blue-400">قواعد التواصل الأساسية</h3><ul class="list-disc list-inside space-y-3 text-gray-300"><li>يجب التعامل مع الراديو بجدية واحترافية، مع اختصار البلاغات قدر الإمكان دون التأثير على مضمونها.</li><li>يمنع منعاً باتاً مقاطعة البلاغات الجارية.</li><li>يمنع التوجه للحالات دون توجيه من مركز العمليات. (يستثنى من ذلك المشرفون الميدانيون "رعد" و "برق" و "درع").</li><li>في حال عدم استجابة العمليات، يسمح بالتوجه للحالة مع ضرورة التبليغ فوراً عبر الراديو.</li><li>يجب الاستجابة لجميع توجيهات العمليات دون نقاش أو رفض.</li><li>يمنع النقاش في الراديو؛ أي نقاشات جانبية تتم في أقرب مركز شرطة.</li><li>عند تولي أي فرد مسؤولية العمليات، يجب عليه تعيين نائب له يكون مسؤولاً عن تسجيل الوحدات.</li></ul></div>
-                        <div><h3 class="text-2xl font-semibold mb-4 text-blue-400">الأكواد المعتمدة</h3><div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 text-gray-200">
-                            <!-- تم تعديل قائمة الأكواد العامة -->
-                            <div class="space-y-2">
-                                <p class="font-bold text-lg border-b border-gray-600 pb-1 mb-2">الأكواد العامة:</p>
-                                <p>🔹 <strong>كود 1:</strong> الموقع آمن أو انتهاء الحالة</p>
-                                <p>🔹 <strong>كود 2:</strong> الموقع غير آمن / اشتباه</p>
-                                <p>🔹 <strong>كود 3:</strong> احتياج دعم بالموقع</p>
-                                <p>🔹 <strong>كود 4:</strong> حالة إطلاق نار واحتياج دعم فوري</p>
-                                <p>🔹 <strong>كود 5:</strong> بلاغ سرقة متجر</p>
-                                <p>🔹 <strong>كود 6:</strong> بلاغ سرقة بنك أو متحف</p>
-                                <!-- تم تعديل كود 7 -->
-                                <p>🔹 <strong>كود 7:</strong> أحتاج راحة <span class="text-red-500 font-semibold">(يمنع أخذ راحة أكثر من 10 د)</span></p>
-                                <p>🔹 <strong>كود 8:</strong> تسجيل دخول بالراديو</p>
-                                <p>🔹 <strong>كود 9:</strong> تسجيل خروج من الراديو</p>
-                                <p>🔹 <strong>كود 10:</strong> الخروج من الموجه للتوجه لموجه اخرى</p>
-                            </div>
-                            <!-- تم تصحيح حالة 3 هنا -->
-                            <div class="space-y-6">
-                                <div class="space-y-2">
-                                    <p class="font-bold text-lg border-b border-gray-600 pb-1 mb-2">أكواد الحالات:</p>
-                                    <p>🔹 <strong>حالة 1:</strong> بلاغ مطاردة مركبة لسبب مروري</p>
-                                    <p>🔹 <strong>حالة 2:</strong> بلاغ مطاردة مركبة لسبب جنائي</p>
-                                    <p>🔹 <strong>حالة 3:</strong> بلاغ عن إطلاق نار</p>
-                                </div>
-                            </div>
-                        </div></div>
-                    </div>
-                </section>
-
-                <!-- 8. موجات الراديو -->
-                <section id="radio-waves" class="content-section">
-                       <h1 class="main-title text-5xl font-extrabold pb-3 mb-8">موجات الراديو</h1>
-                       <div class="glass-ui p-8 rounded-2xl">
-                            <p class="mb-6 text-lg">الالتزام بالموجة الصحيحة أمر إلزامي لضمان عدم تداخل الاتصالات وتنظيم العمل الميداني.</p>
-                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                <div class="bg-red-700/60 p-4 rounded-lg flex justify-between items-center"> <span class="font-semibold">🔹 موجات السرقات</span> <span class="text-2xl font-bold text-red-200 font-mono">1-2-3</span> </div>
-                                <div class="bg-blue-900/50 p-4 rounded-lg flex justify-between items-center"> <span class="font-semibold">🔹 موجة لوس سانتوس</span> <span class="text-2xl font-bold text-blue-300 font-mono">4</span> </div>
-                                <div class="bg-blue-900/50 p-4 rounded-lg flex justify-between items-center"> <span class="font-semibold">🔹 موجة ساندي وبليتو</span> <span class="text-2xl font-bold text-blue-300 font-mono">5</span> </div>
-                                <div class="bg-blue-900/50 p-4 rounded-lg flex justify-between items-center"> <span class="font-semibold">🔹 موجة أمن الطرق</span> <span class="text-2xl font-bold text-blue-300 font-mono">6</span> </div>
-                                <div class="bg-blue-900/50 p-4 rounded-lg flex justify-between items-center"> <span class="font-semibold">🔹 موجة المرور</span> <span class="text-2xl font-bold text-blue-300 font-mono">7</span> </div>
-                                <div class="bg-green-900/50 p-4 rounded-lg flex justify-between items-center"> <span class="font-semibold">🔹 امن منشات</span> <span class="text-2xl font-bold text-green-300 font-mono">8</span> </div>
-                                <div class="bg-green-900/50 p-4 rounded-lg flex justify-between items-center"> <span class="font-semibold">🔹 امن منشات خارج الميناء</span> <span class="text-2xl font-bold text-green-300 font-mono">9</span> </div>
-                                <div class="bg-black/50 p-4 rounded-lg flex justify-between items-center"> <span class="font-semibold">🔹 القوات الخاصة</span> <span class="text-2xl font-bold text-white font-mono">10</span> </div>
-                                <div class="bg-teal-900/50 p-4 rounded-lg flex justify-between items-center"> <span class="font-semibold">🔹 مشتركة القطاعات الحكومية</span> <span class="text-2xl font-bold text-teal-300 font-mono">11</span> </div>
-                                <div class="bg-red-900/60 p-4 rounded-lg flex justify-between items-center"> <span class="font-semibold">🔹 الهلال الاحمر (لوس سانتوس)</span> <span class="text-2xl font-bold text-red-300 font-mono">13</span> </div>
-                                <div class="bg-red-900/60 p-4 rounded-lg flex justify-between items-center"> <span class="font-semibold">🔹 الهلال الاحمر (ساندي بليتو)</span> <span class="text-2xl font-bold text-red-300 font-mono">14</span> </div>
-                                <div class="bg-gray-700 p-4 rounded-lg flex justify-between items-center"> <span class="font-semibold">🔹 ميكانيكي تعديل وتزويد</span> <span class="text-2xl font-bold text-gray-300 font-mono">17</span> </div>
-                                <div class="bg-gray-700 p-4 rounded-lg flex justify-between items-center"> <span class="font-semibold">🔹 ميكانيكي ميدان</span> <span class="text-2xl font-bold text-gray-300 font-mono">18</span> </div>
-                            </div>
-                       </div>
-                </section>
-
-                <!-- 9. شروط الترقيات -->
-                <section id="promotion-conditions" class="content-section">
-                    <h1 class="main-title text-5xl font-extrabold pb-3 mb-8">شروط الترقيات</h1>
-                    <div class="glass-ui p-8 rounded-2xl text-center">
-                        <p class="text-xl text-gray-300 mb-8">للاطلاع على شروط ومتطلبات الترقية التفصيلية، يرجى اختيار المسار الوظيفي المناسب أدناه. سيتم فتح الجدول في نافذة جديدة.</p>
-                        <div class="flex flex-col md:flex-row justify-center items-center gap-8">
-                            <a href="https://docs.google.com/spreadsheets/d/1pbS3a0uXLH-Rdjknp-N480zxh9t6R-oRbDDOXM1vX88/edit?gid=247801740#gid=247801740" target="_blank" class="action-button inline-block bg-gradient-to-r from-sky-500 to-sky-600 text-white font-bold py-4 px-10 rounded-lg text-xl w-full md:w-auto"><i data-lucide="shield-check" class="inline-block w-8 h-8 ml-3"></i>الموظف الأساسي</a>
-                            <a href="https://docs.google.com/spreadsheets/d/1pbS3a0uXLH-Rdjknp-N480zxh9t6R-oRbDDOXM1vX88/edit?gid=2099425206#gid=2099425206" target="_blank" class="action-button inline-block bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-bold py-4 px-10 rounded-lg text-xl w-full md:w-auto"><i data-lucide="star" class="inline-block w-8 h-8 ml-3"></i>الموظف المعتمد</a>
-                        </div>
-                        <p class="mt-8 text-sm text-gray-500">تُحدّث هذه الجداول مباشرة من قبل القيادة لضمان دقة المعلومات.</p>
-                    </div>
-                </section>
-
-                <!-- 10. المركبات العسكرية -->
-                <section id="military-vehicles" class="content-section">
-                    <h1 class="main-title text-5xl font-extrabold pb-3 mb-8">المركبات العسكرية</h1>
-                    <div class="glass-ui p-10 rounded-2xl">
-                        <div class="text-center">
-                            <i data-lucide="lock-keyhole" class="mx-auto h-20 w-20 text-blue-400"></i>
-                            <h3 class="text-3xl font-bold mt-4">نظام تصريح المركبات</h3>
-                            <p class="text-xl text-gray-300 mt-3">المركبات المصرحة لرتبتك سوف تظهر لك بشكل تلقائي في معرض الوكالة.</p>
-                        </div>
-                        <hr class="my-8 border-gray-700">
-                        <div class="text-right space-y-4">
-                             <h4 class="text-2xl font-bold text-red-400 mb-3">تنويهات هامة</h4>
-                             <p class="text-lg text-gray-300">يسمح بالتظليل على المركبات السرية التابعة للمشرفين الميدانين من رتبة ملازم فما اعلى و لوحدات المهام التابعة لجميع المناطق</p>
-                             <p class="text-lg text-gray-300">
-                                و يسمح تغير لون المركبة السرية للمشرفين الميدانين من رتبة ملازم فما اعلى و تكون هذه الالوان و هي 
-                                <span class="font-semibold" style="color: #000000; text-shadow: 0 0 4px #FFF;">اسود</span> - 
-                                <span class="font-semibold" style="color: #FFFFFF;">ابيض</span> - 
-                                <span class="font-semibold" style="color: #A9A9A9;">رصاصي</span> - 
-                                <span class="font-semibold" style="color: #3b82f6;">ازرق</span> - 
-                                <span class="font-semibold" style="color: #ef4444;">احمر</span> - 
-                                <span class="font-semibold" style="color: #15803d;">اخضر غامق</span>
-                             </p>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- 11. قسم الدورات العسكرية -->
-                <section id="military-courses" class="content-section">
-                    <h1 class="main-title text-5xl font-extrabold pb-3 mb-8">قسم الدورات العسكرية</h1>
-                    <div class="glass-ui p-8 rounded-2xl">
-                        <p class="text-center text-xl text-gray-300 mb-8">للاطلاع على متطلبات ومناهج الدورات التدريبية، يرجى اختيار الدورة المطلوبة من القائمة أدناه.</p>
-                        <div class="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-6 gap-6">
-                            <a href="https://drive.google.com/file/d/1Ygxt3yIKTpi6wdgvkmgqbCsZpKfMph-D/view" target="_blank" class="action-button flex flex-col items-center justify-center text-center p-6 bg-slate-800/70 border border-slate-700 rounded-lg md:col-span-2 lg:col-span-2"><i data-lucide="headphones" class="h-16 w-16 mb-2 text-blue-400"></i><h3 class="text-2xl font-bold">دورة العمليات</h3></a>
-                            <a href="https://drive.google.com/file/d/1BSJfqIMORlywEs1HmzPR7KV7NDVDEdhV/view" target="_blank" class="action-button flex flex-col items-center justify-center text-center p-6 bg-slate-800/70 border border-slate-700 rounded-lg md:col-span-2 lg:col-span-2"><i data-lucide="traffic-cone" class="h-16 w-16 mb-2 text-blue-400"></i><h3 class="text-2xl font-bold">دورة المرور و امن الطرق</h3></a>
-                            <a href="https://drive.google.com/file/d/1U84Y9lx_odQm1NuD_VNia3dGuymP3cdy/view" target="_blank" class="action-button flex flex-col items-center justify-center text-center p-6 bg-slate-800/70 border border-slate-700 rounded-lg md:col-span-2 lg:col-span-2"><i data-lucide="plane" class="h-16 w-16 mb-2 text-blue-400"></i><h3 class="text-2xl font-bold">دورة الجناح الجوي</h3></a>
-                            
-                            <!-- تم نقل الدورة الجديدة هنا -->
-                            <a href="https://docs.google.com/document/d/15Qs-QPNPBiHrEEJu2kUuPa2WV4cEyafA7Ay35M8hBzg/edit?tab=t.0" target="_blank" class="action-button flex flex-col items-center justify-center text-center p-6 bg-slate-800/70 border border-slate-700 rounded-lg md:col-span-2 lg:col-start-2 lg:col-span-2"><i data-lucide="sword" class="h-16 w-16 mb-2 text-blue-400"></i><h3 class="text-2xl font-bold">دورة المهام و الواجبات الخاصة</h3></a>
-                            
-                            <!-- دورة تأهيل الضباط تأتي الآن بعد الدورة الجديدة -->
-                            <a href="https://drive.google.com/file/d/1dDNOGohpBclkiMqnJhgcnSo5Ado83a68/view" target="_blank" class="action-button flex flex-col items-center justify-center text-center p-6 bg-slate-800/70 border border-slate-700 rounded-lg md:col-start-2 md:col-span-2 lg:col-start-auto lg:col-span-2"><i data-lucide="star" class="h-16 w-16 mb-2 text-blue-400"></i><h3 class="text-2xl font-bold">دورة تأهيل الضباط</h3></a>
-                        </div>
-                    </div>
-                </section>
-        </div>
+            <!-- Right Side -->
+            <a href="#home" class="nav-node right-side" id="node-7"><i data-lucide="home"></i><span class="node-label">الرئيسية</span></a>
+            <a href="#comprehensive-guide" class="nav-node right-side" id="node-8"><i data-lucide="book-open"></i><span class="node-label">الدليل الشامل</span></a>
+            <a href="#practical-training" class="nav-node right-side" id="node-9"><i data-lucide="monitor-play"></i><span class="node-label">قسم التدريب العملي</span></a>
+            <a href="#laws" class="nav-node right-side" id="node-10"><i data-lucide="scale"></i><span class="node-label">القوانين</span></a>
+            <a href="#prohibitions" class="nav-node right-side" id="node-11"><i data-lucide="ban"></i><span class="node-label">المحظورات</span></a>
+            <a href="#military-courses" class="nav-node right-side" id="node-12"><i data-lucide="graduation-cap"></i><span class="node-label">الدورات العسكرية</span></a>
+        </nav>
     </main>
+
+    <div id="content-overlay">
+        <div id="content-card">
+            <button id="close-content-btn" aria-label="إغلاق"><i data-lucide="x"></i></button>
+            <div id="card-body"></div>
+        </div>
+    </div>
+
+
+    <div id="hidden-content" class="hidden">
+        <section id="home">
+            <div class="text-center flex flex-col items-center justify-center h-full p-4">
+                <i data-lucide="shield" class="w-24 h-24 text-blue-500 mb-6 drop-shadow-lg"></i>
+                <h1 class="main-title text-4xl font-extrabold pb-3 mb-6">مرحباً بك في البوابة الرسمية</h1>
+                <p class="text-xl text-gray-300 max-w-4xl leading-relaxed">
+                    هذا هو الموقع الرسمي والوحيد التابع لإدارة شرطة مقاطعة ريج. يُعد هذا الدليل الإلكتروني هو مرجعك الشامل لكل ما تحتاجه كفرد أمن، من القوانين والأنظمة، إلى بروتوكولات الراديو، وشروط الترقيات. هدفنا هو ضمان الاحترافية القصوى والتنسيق الكامل في جميع المهام الميدانية.
+                </p>
+                <p class="text-blue-400 font-semibold text-xl mt-6">اضغط على العُقد العائمة حولك للتنقل بين الأقسام.</p>
+            </div>
+        </section>
+        <section id="comprehensive-guide">
+            <h1 class="main-title text-5xl font-extrabold pb-3 mb-8">الدليل الشامل للأمن العام</h1>
+            <div class="p-8 rounded-2xl text-center">
+                <p class="text-xl text-gray-300 mb-8">لعرض الدليل الشامل والمحدث دائماً، يرجى الضغط على الرابط أدناه. سيتم فتح المستند الرسمي في نافذة جديدة.</p>
+                <a href="https://docs.google.com/document/d/19_SX1exwSlyebgRaddjGHV9Oc0oYwCjX4TaWJxsRyOE/edit?tab=t.0" target="_blank" class="action-button inline-block bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold py-4 px-10 rounded-lg text-xl"><i data-lucide="external-link" class="inline-block w-8 h-8 ml-3"></i>فتح الدليل الشامل</a>
+                <p class="mt-6 text-sm text-gray-500">هذه الطريقة تضمن أنك تحصل دائمًا على أحدث نسخة من الدليل مباشرة من القيادة.</p>
+            </div>
+        </section>
+        <section id="practical-training">
+            <h1 class="main-title text-5xl font-extrabold pb-3 mb-8">قسم التدريب العملي</h1>
+            <div class="space-y-6">
+                 <div class="p-6 rounded-2xl bg-black/20"><div class="flex justify-between items-center"><h3 class="text-2xl font-semibold text-blue-400">1-1 طريقة استعمال F6 العسكرية</h3><span class="text-red-500 font-bold text-xl mr-4">قريبا</span></div></div>
+                 <div class="p-6 rounded-2xl bg-black/20"><div class="flex justify-between items-center"><h3 class="text-2xl font-semibold text-blue-400">1-2 طريقة استعمال جهاز الشرطة ال MDT</h3><span class="text-red-500 font-bold text-xl mr-4">قريبا</span></div></div>
+                 <div class="p-6 rounded-2xl bg-black/20"><div class="flex justify-between items-center"><h3 class="text-2xl font-semibold text-blue-400">1-3 الالية المتبعة في الاستيقاف المروري و الجنائي</h3><span class="text-red-500 font-bold text-xl mr-4">قريبا</span></div></div>
+                 <div class="p-6 rounded-2xl bg-black/20"><div class="flex justify-between items-center"><h3 class="text-2xl font-semibold text-blue-400">1-4 الالية المتبعة في المطاردات</h3><span class="text-red-500 font-bold text-xl mr-4">قريبا</span></div></div>
+                 <div class="p-6 rounded-2xl bg-black/20"><div class="flex justify-between items-center"><h3 class="text-2xl font-semibold text-blue-400">1-5 طريقة التعامل مع المجرمين</h3><span class="text-red-500 font-bold text-xl mr-4">قريبا</span></div></div>
+                 <div class="p-6 rounded-2xl bg-black/20"><div class="flex justify-between items-center"><h3 class="text-2xl font-semibold text-blue-400">1-6 الالية المتبعة في الاستنفارات الامنية و حالات الاختطاف</h3><span class="text-red-500 font-bold text-xl mr-4">قريبا</span></div></div>
+            </div>
+        </section>
+        <section id="laws">
+            <h1 class="main-title text-5xl font-extrabold pb-3 mb-8">القوانين</h1>
+            <div>
+                <h3 class="text-2xl font-semibold mb-4 text-blue-400">القوانين العامة</h3>
+                <ul class="list-disc list-inside space-y-3 text-gray-300">
+                    <li>الالتزام باحترام القوانين والأنظمة داخل المقاطعة وعدم إساءة استخدام الصلاحيات</li>
+                    <li>الالتزام بالأوامر والتعليمات الصادرة من القيادة أو مركز العمليات</li>
+                    <li>المحافظة على صورة رجل الأمن داخل السيرفر (احترام المواطنين – التعاون – عدم الاستهتار)</li>
+                    <li>يمنع استخدام صلاحيات الشرطة لمصالح شخصية أو للتسلية</li>
+                    <li>جميع أفراد الشرطة خاضعون للمساءلة عند مخالفة التعليمات</li>
+                </ul>
+                <hr class="my-6 border-gray-700">
+                <h3 class="text-2xl font-semibold my-4 text-blue-400">👮‍♂️ قوانين الأفراد</h3>
+                <ul class="list-disc list-inside space-y-3 text-gray-300">
+                    <li>الالتزام بالزي الرسمي أثناء الدوام</li>
+                    <li>التواجد على الموجات الرسمية وتسجيل الدخول والخروج بالراديو (كود 8 / كود 9)</li>
+                    <li>يمنع التدخل في اختصاص القطاعات الأخرى إلا عند طلب الدعم</li>
+                    <li>التعامل مع البلاغات بجدية وعدم التهاون أو تجاهل النداءات</li>
+                    <li>احترام الرتب الأعلى والالتزام بسلسلة القيادة</li>
+                    <li>تنفيذ اوامر الضباط بدون نقاش وفي حال يوجد مخالفة ( نفذ بعدها اشتكي)</li>
+                    <li>يمنع مناقشة الضباط في الميدان و الاكتفاء بتسجيل مقطع ورفع شكوى</li>
+                </ul>
+                <hr class="my-6 border-gray-700">
+                <h3 class="text-2xl font-semibold my-4 text-blue-400">🧑‍✈️ قوانين الضباط</h3>
+                <ul class="list-disc list-inside space-y-3 text-gray-300">
+                    <li>متابعة انضباط الأفراد تحت قيادتهم والتأكد من التزامهم بالقوانين</li>
+                    <li>رفع تقارير دورية عن سير العمل والحالات المهمة للقيادة</li>
+                    <li>التدريب والتوجيه المستمر للأفراد الجدد</li>
+                    <li>التحلي بالمسؤولية في استخدام الصلاحيات وعدم التعسف</li>
+                    <li>أن يكونوا قدوة في الالتزام والانضباط داخل الميدان</li>
+                    <li>متابعة الافراد في الميدان بشكل كامل و متابعة الراديو</li>
+                </ul>
+            </div>
+        </section>
+        <section id="prohibitions">
+            <h1 class="main-title text-5xl font-extrabold pb-3 mb-8">المحظورات</h1>
+            <div class="text-center border-red-500/50 bg-red-900/20 p-8 rounded-2xl">
+                <i data-lucide="alert-triangle" class="w-20 h-20 text-red-400 mx-auto mb-4"></i>
+                <p class="text-2xl font-bold text-red-300 mb-8">يرجى متابعة جدول العقوبات لتجنب المخالفات</p>
+                <a href="https://docs.google.com/spreadsheets/d/1pbS3a0uXLH-Rdjknp-N480zxh9t6R-oRbDDOXM1vX88/edit?gid=360352132#gid=360352132" target="_blank" class="action-button inline-flex items-center justify-center gap-3 bg-gradient-to-r from-red-600 to-rose-700 text-white font-bold py-4 px-10 rounded-lg text-xl hover:from-red-700 hover:to-rose-800"><i data-lucide="book-warning" class="inline-block w-8 h-8"></i>فتح جدول العقوبات</a>
+            </div>
+        </section>
+        <section id="official-schedule">
+            <h1 class="main-title text-5xl font-extrabold pb-3 mb-8">جدول الأمن العام</h1>
+            <div class="text-center p-8 rounded-2xl">
+                <p class="text-xl text-gray-300 mb-8">للاطلاع على الجدول الرسمي لجميع أفراد الأمن العام، بما في ذلك الرتب، الدورات، والتقييمات، يرجى الضغط على الرابط أدناه.</p>
+                <a href="https://docs.google.com/spreadsheets/d/1pbS3a0uXLH-Rdjknp-N480zxh9t6R-oRbDDOXM1vX88/edit?gid=515747649#gid=515747649" target="_blank" class="action-button inline-block bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold py-4 px-10 rounded-lg text-xl"><i data-lucide="table" class="inline-block w-8 h-8 ml-3"></i>فتح جدول الأمن العام</a>
+                <p class="mt-6 text-sm text-gray-500">يتم تحديث هذا الجدول بشكل دوري من قبل القيادة.</p>
+            </div>
+        </section>
+        <section id="field-designations">
+            <h1 class="main-title text-5xl font-extrabold pb-3 mb-8">المسميات الميدانية</h1>
+            <div class="space-y-10">
+                 <div>
+                    <h2 class="text-3xl font-bold text-blue-300 mb-5 border-b-2 border-blue-800 pb-3">المشرفين الميدانين</h2>
+                    <div class="space-y-4 mt-4">
+                        <div class="p-4 bg-slate-900/50 rounded-lg border border-slate-700"><h3 class="text-xl font-bold text-blue-400">درع</h3><p class="mr-4 text-gray-300">مشرف من رتبة مقدم فما فوق و يكون المسؤول عن جميع المشرفين الضباط رعد برق</p></div>
+                        <div class="p-4 bg-slate-900/50 rounded-lg border border-slate-700"><h3 class="text-xl font-bold text-blue-400">رعد</h3><p class="mr-4 text-gray-300">مشرف من رتبة ملازم الى رائد و هو المسؤول عن الإشراف الكامل على رئيس الرقباء وجميع العمليات الميدانية في منطقة لوس سانتوس</p></div>
+                        <div class="p-4 bg-slate-900/50 rounded-lg border border-slate-700"><h3 class="text-xl font-bold text-blue-400">برق</h3><p class="mr-4 text-gray-300">مشرف من رتبة ملازم الى رائد و هو المسؤول عن الإشراف الكامل على رئيس الرقباء وجميع العمليات الميدانية في منطقة ساندي و بليتو</p></div>
+                        <div class="p-4 bg-slate-900/50 rounded-lg border border-slate-700"><h3 class="text-xl font-bold text-blue-400">رمح</h3><p class="mr-4 text-gray-300">مشرف على جميع الافراد التابعة لمنطقته لوس سانتوس او ساندي و بليتو</p></div>
+                    </div>
+                </div>
+                <div>
+                    <h2 class="text-3xl font-bold text-blue-300 mb-5 border-b-2 border-blue-800 pb-3">وحدات الضباط الجانبية</h2>
+                    <div class="space-y-4 mt-4">
+                        <div class="p-4 bg-slate-900/50 rounded-lg border border-slate-700"><h3 class="text-xl font-bold text-blue-400">شمال و غرب و جنوب و شرق</h3><p class="mr-4 text-gray-300">هم ضباط من رتبة ملازم فما اعلى يسجلون في هذه المسمى في حال اكتمال الرعود و البروق</p></div>
+                    </div>
+                </div>
+                <div>
+                    <h2 class="text-3xl font-bold text-blue-300 mb-5 border-b-2 border-blue-800 pb-3">الافراد</h2>
+                    <div class="space-y-4 mt-4">
+                        <div class="p-4 bg-slate-900/50 rounded-lg border border-slate-700"><h3 class="text-xl font-bold text-blue-400">L-10 الى L-19</h3><p class="mr-4 text-gray-300">الافراد التابعين لمنطقة L-01</p></div>
+                        <div class="p-4 bg-slate-900/50 rounded-lg border border-slate-700"><h3 class="text-xl font-bold text-blue-400">L-20 الى L-29</h3><p class="mr-4 text-gray-300">الافراد التابعين لمنطقة L-02</p></div>
+                        <div class="p-4 bg-slate-900/50 rounded-lg border border-slate-700"><h3 class="text-xl font-bold text-blue-400">L-30 الى L-39</h3><p class="mr-4 text-gray-300">الافراد التابعين لمنطقة L-03</p></div>
+                        <div class="p-4 bg-slate-900/50 rounded-lg border border-slate-700"><h3 class="text-xl font-bold text-blue-400">L-40 الى L-49</h3><p class="mr-4 text-gray-300">الافراد التابعين لمنطقة L-04</p></div>
+                        <div class="p-4 bg-slate-900/50 rounded-lg border border-slate-700"><h3 class="text-xl font-bold text-blue-400">L-50 الى L-59</h3><p class="mr-4 text-gray-300">الافراد التابعين لمنطقة L-05</p></div>
+                    </div>
+                </div>
+                <div>
+                    <h2 class="text-3xl font-bold text-blue-300 mb-5 border-b-2 border-blue-800 pb-3">الوحدات المتخصصة</h2>
+                    <div class="space-y-4 mt-4">
+                        <div class="p-4 bg-slate-900/50 rounded-lg border border-slate-700"><h3 class="text-xl font-bold text-blue-400">ميم</h3><p class="mr-4 text-gray-300">وحدات المرور التابعة لجميع المناطق</p></div>
+                        <div class="p-4 bg-slate-900/50 rounded-lg border border-slate-700"><h3 class="text-xl font-bold text-blue-400">امن</h3><p class="mr-4 text-gray-300">وحدات امن الطرق التابعة لجميع المناطق</p></div>
+                        <div class="p-4 bg-slate-900/50 rounded-lg border border-slate-700"><h3 class="text-xl font-bold text-blue-400">صقر</h3><p class="mr-4 text-gray-300">الوحدات الجوية حيث ان صقر 1 هو قيادة الامن العام و صقر 2 و 3 هو للافراد و الضباط التابعين لمنطقة لوس سانتوس و صقر 4 و 5 هو للافراد و الضباط لنقطة ساندي و بليتو</p></div>
+                        <div class="p-4 bg-slate-900/50 rounded-lg border border-slate-700"><h3 class="text-xl font-bold text-blue-400">مهام</h3><p class="mr-4 text-gray-300">وحدات المهام التابعة للوس و ساندي و بليتو حيث ان مهام 1 و 2 و 3 تابعين لمنقطة لوس سانتوس و مهام 4 و 5 و 6 تابعين لمنطقة ساندي و بليتو</p></div>
+                        <div class="p-4 bg-slate-900/50 rounded-lg border border-slate-700"><h3 class="text-xl font-bold text-blue-400">الامن الجنائي</h3><p class="mr-4 text-gray-300">وحدات البحث و التحري في جميع المناطق</p></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="radio-protocols">
+            <h1 class="main-title text-5xl font-extrabold pb-3 mb-8">بروتوكولات الراديو</h1>
+            <div class="space-y-8">
+                <div><h3 class="text-2xl font-semibold mb-3 text-blue-400">قواعد التواصل الأساسية</h3><ul class="list-disc list-inside space-y-3 text-gray-300"><li>يجب التعامل مع الراديو بجدية واحترافية، مع اختصار البلاغات قدر الإمكان دون التأثير على مضمونها.</li><li>يمنع منعاً باتاً مقاطعة البلاغات الجارية.</li><li>يمنع التوجه للحالات دون توجيه من مركز العمليات. (يستثنى من ذلك المشرفون الميدانيون "رعد" و "برق" و "درع").</li><li>في حال عدم استجابة العمليات، يسمح بالتوجه للحالة مع ضرورة التبليغ فوراً عبر الراديو.</li><li>يجب الاستجابة لجميع توجيهات العمليات دون نقاش أو رفض.</li><li>يمنع النقاش في الراديو؛ أي نقاشات جانبية تتم في أقرب مركز شرطة.</li><li>عند تولي أي فرد مسؤولية العمليات، يجب عليه تعيين نائب له يكون مسؤولاً عن تسجيل الوحدات.</li></ul></div>
+                <div><h3 class="text-2xl font-semibold mb-4 text-blue-400">الأكواد المعتمدة</h3><div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 text-gray-200">
+                    <div class="space-y-2">
+                        <p class="font-bold text-lg border-b border-gray-600 pb-1 mb-2">الأكواد العامة:</p>
+                        <p>🔹 <strong>كود 1:</strong> الموقع آمن أو انتهاء الحالة</p>
+                        <p>🔹 <strong>كود 2:</strong> الموقع غير آمن / اشتباه</p>
+                        <p>🔹 <strong>كود 3:</strong> احتياج دعم بالموقع</p>
+                        <p>🔹 <strong>كود 4:</strong> حالة إطلاق نار واحتياج دعم فوري</p>
+                        <p>🔹 <strong>كود 5:</strong> بلاغ سرقة متجر</p>
+                        <p>🔹 <strong>كود 6:</strong> بلاغ سرقة بنك أو متحف</p>
+                        <p>🔹 <strong>كود 7:</strong> أحتاج راحة <span class="text-red-500 font-semibold">(يمنع أخذ راحة أكثر من 10 د)</span></p>
+                        <p>🔹 <strong>كود 8:</strong> تسجيل دخول بالراديو</p>
+                        <p>🔹 <strong>كود 9:</strong> تسجيل خروج من الراديو</p>
+                        <p>🔹 <strong>كود 10:</strong> الخروج من الموجه للتوجه لموجه اخرى</p>
+                    </div>
+                    <div class="space-y-6">
+                        <div class="space-y-2">
+                            <p class="font-bold text-lg border-b border-gray-600 pb-1 mb-2">أكواد الحالات:</p>
+                            <p>🔹 <strong>حالة 1:</strong> بلاغ مطاردة مركبة لسبب مروري</p>
+                            <p>🔹 <strong>حالة 2:</strong> بلاغ مطاردة مركبة لسبب جنائي</p>
+                            <p>🔹 <strong>حالة 3:</strong> بلاغ عن إطلاق نار</p>
+                        </div>
+                    </div>
+                </div></div>
+            </div>
+        </section>
+        <section id="radio-waves">
+            <h1 class="main-title text-5xl font-extrabold pb-3 mb-8">موجات الراديو</h1>
+            <div>
+                <p class="mb-6 text-lg">الالتزام بالموجة الصحيحة أمر إلزامي لضمان عدم تداخل الاتصالات وتنظيم العمل الميداني.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="bg-red-700/60 p-4 rounded-lg flex justify-between items-center"> <span class="font-semibold">🔹 موجات السرقات</span> <span class="text-2xl font-bold text-red-200 font-mono">1-2-3</span> </div>
+                    <div class="bg-blue-900/50 p-4 rounded-lg flex justify-between items-center"> <span class="font-semibold">🔹 موجة لوس سانتوس</span> <span class="text-2xl font-bold text-blue-300 font-mono">4</span> </div>
+                    <div class="bg-blue-900/50 p-4 rounded-lg flex justify-between items-center"> <span class="font-semibold">🔹 موجة ساندي وبليتو</span> <span class="text-2xl font-bold text-blue-300 font-mono">5</span> </div>
+                    <div class="bg-blue-900/50 p-4 rounded-lg flex justify-between items-center"> <span class="font-semibold">🔹 موجة أمن الطرق</span> <span class="text-2xl font-bold text-blue-300 font-mono">6</span> </div>
+                    <div class="bg-blue-900/50 p-4 rounded-lg flex justify-between items-center"> <span class="font-semibold">🔹 موجة المرور</span> <span class="text-2xl font-bold text-blue-300 font-mono">7</span> </div>
+                    <div class="bg-green-900/50 p-4 rounded-lg flex justify-between items-center"> <span class="font-semibold">🔹 امن منشات</span> <span class="text-2xl font-bold text-green-300 font-mono">8</span> </div>
+                    <div class="bg-green-900/50 p-4 rounded-lg flex justify-between items-center"> <span class="font-semibold">🔹 امن منشات خارج الميناء</span> <span class="text-2xl font-bold text-green-300 font-mono">9</span> </div>
+                    <div class="bg-black/50 p-4 rounded-lg flex justify-between items-center"> <span class="font-semibold">🔹 القوات الخاصة</span> <span class="text-2xl font-bold text-white font-mono">10</span> </div>
+                    <div class="bg-teal-900/50 p-4 rounded-lg flex justify-between items-center"> <span class="font-semibold">🔹 مشتركة القطاعات الحكومية</span> <span class="text-2xl font-bold text-teal-300 font-mono">11</span> </div>
+                    <div class="bg-red-900/60 p-4 rounded-lg flex justify-between items-center"> <span class="font-semibold">🔹 الهلال الاحمر (لوس سانتوس)</span> <span class="text-2xl font-bold text-red-300 font-mono">13</span> </div>
+                    <div class="bg-red-900/60 p-4 rounded-lg flex justify-between items-center"> <span class="font-semibold">🔹 الهلال الاحمر (ساندي بليتو)</span> <span class="text-2xl font-bold text-red-300 font-mono">14</span> </div>
+                    <div class="bg-gray-700 p-4 rounded-lg flex justify-between items-center"> <span class="font-semibold">🔹 ميكانيكي تعديل وتزويد</span> <span class="text-2xl font-bold text-gray-300 font-mono">17</span> </div>
+                    <div class="bg-gray-700 p-4 rounded-lg flex justify-between items-center"> <span class="font-semibold">🔹 ميكانيكي ميدان</span> <span class="text-2xl font-bold text-gray-300 font-mono">18</span> </div>
+                </div>
+           </div>
+        </section>
+        <section id="promotion-conditions">
+            <h1 class="main-title text-5xl font-extrabold pb-3 mb-8">شروط الترقيات</h1>
+            <div class="text-center">
+                <p class="text-xl text-gray-300 mb-8">للاطلاع على شروط ومتطلبات الترقية التفصيلية، يرجى اختيار المسار الوظيفي المناسب أدناه. سيتم فتح الجدول في نافذة جديدة.</p>
+                <div class="flex flex-col md:flex-row justify-center items-center gap-8">
+                    <a href="https://docs.google.com/spreadsheets/d/1pbS3a0uXLH-Rdjknp-N480zxh9t6R-oRbDDOXM1vX88/edit?gid=247801740#gid=247801740" target="_blank" class="action-button inline-block bg-gradient-to-r from-sky-500 to-sky-600 text-white font-bold py-4 px-10 rounded-lg text-xl w-full md:w-auto"><i data-lucide="shield-check" class="inline-block w-8 h-8 ml-3"></i>الموظف الأساسي</a>
+                    <a href="https://docs.google.com/spreadsheets/d/1pbS3a0uXLH-Rdjknp-N480zxh9t6R-oRbDDOXM1vX88/edit?gid=2099425206#gid=2099425206" target="_blank" class="action-button inline-block bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-bold py-4 px-10 rounded-lg text-xl w-full md:w-auto"><i data-lucide="star" class="inline-block w-8 h-8 ml-3"></i>الموظف المعتمد</a>
+                </div>
+                <p class="mt-8 text-sm text-gray-500">تُحدّث هذه الجداول مباشرة من قبل القيادة لضمان دقة المعلومات.</p>
+            </div>
+        </section>
+        <section id="military-vehicles">
+            <h1 class="main-title text-5xl font-extrabold pb-3 mb-8">المركبات العسكرية</h1>
+            <div class="p-10 rounded-2xl">
+                <div class="text-center">
+                    <i data-lucide="lock-keyhole" class="mx-auto h-20 w-20 text-blue-400"></i>
+                    <h3 class="text-3xl font-bold mt-4">نظام تصريح المركبات</h3>
+                    <p class="text-xl text-gray-300 mt-3">المركبات المصرحة لرتبتك سوف تظهر لك بشكل تلقائي في معرض الوكالة.</p>
+                </div>
+                <hr class="my-8 border-gray-700">
+                <div class="text-right space-y-4">
+                     <h4 class="text-2xl font-bold text-red-400 mb-3">تنويهات هامة</h4>
+                     <p class="text-lg text-gray-300">يسمح بالتظليل على المركبات السرية التابعة للمشرفين الميدانين من رتبة ملازم فما اعلى و لوحدات المهام التابعة لجميع المناطق</p>
+                     <p class="text-lg text-gray-300">
+                        و يسمح تغير لون المركبة السرية للمشرفين الميدانين من رتبة ملازم فما اعلى و تكون هذه الالوان و هي 
+                        <span class="font-semibold" style="color: #000000; text-shadow: 0 0 4px #FFF;">اسود</span> - 
+                        <span class="font-semibold" style="color: #FFFFFF;">ابيض</span> - 
+                        <span class="font-semibold" style="color: #A9A9A9;">رصاصي</span> - 
+                        <span class="font-semibold" style="color: #3b82f6;">ازرق</span> - 
+                        <span class="font-semibold" style="color: #ef4444;">احمر</span> - 
+                        <span class="font-semibold" style="color: #15803d;">اخضر غامق</span>
+                     </p>
+                </div>
+            </div>
+        </section>
+        <section id="military-courses">
+            <h1 class="main-title text-5xl font-extrabold pb-3 mb-8">قسم الدورات العسكرية</h1>
+            <div>
+                <p class="text-center text-xl text-gray-300 mb-8">للاطلاع على متطلبات ومناهج الدورات التدريبية، يرجى اختيار الدورة المطلوبة من القائمة أدناه.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <a href="https://drive.google.com/file/d/1Ygxt3yIKTpi6wdgvkmgqbCsZpKfMph-D/view" target="_blank" class="action-button flex flex-col items-center justify-center text-center p-6 bg-slate-800/70 border border-slate-700 rounded-lg"><i data-lucide="headphones" class="h-12 w-12 mb-2 text-blue-400"></i><h3 class="text-xl font-bold">دورة العمليات</h3></a>
+                    <a href="https://drive.google.com/file/d/1BSJfqIMORlywEs1HmzPR7KV7NDVDEdhV/view" target="_blank" class="action-button flex flex-col items-center justify-center text-center p-6 bg-slate-800/70 border border-slate-700 rounded-lg"><i data-lucide="traffic-cone" class="h-12 w-12 mb-2 text-blue-400"></i><h3 class="text-xl font-bold">دورة المرور و امن الطرق</h3></a>
+                    <a href="https://drive.google.com/file/d/1U84Y9lx_odQm1NuD_VNia3dGuymP3cdy/view" target="_blank" class="action-button flex flex-col items-center justify-center text-center p-6 bg-slate-800/70 border border-slate-700 rounded-lg"><i data-lucide="plane" class="h-12 w-12 mb-2 text-blue-400"></i><h3 class="text-xl font-bold">دورة الجناح الجوي</h3></a>
+                    <a href="https://docs.google.com/document/d/15Qs-QPNPBiHrEEJu2kUuPa2WV4cEyafA7Ay35M8hBzg/edit?tab=t.0" target="_blank" class="action-button flex flex-col items-center justify-center text-center p-6 bg-slate-800/70 border border-slate-700 rounded-lg"><i data-lucide="sword" class="h-12 w-12 mb-2 text-blue-400"></i><h3 class="text-xl font-bold">دورة المهام الخاصة</h3></a>
+                    <a href="https://drive.google.com/file/d/1dDNOGohpBclkiMqnJhgcnSo5Ado83a68/view" target="_blank" class="action-button flex flex-col items-center justify-center text-center p-6 bg-slate-800/70 border border-slate-700 rounded-lg md:col-span-2"><i data-lucide="star" class="h-12 w-12 mb-2 text-blue-400"></i><h3 class="text-xl font-bold">دورة تأهيل الضباط</h3></a>
+                </div>
+            </div>
+        </section>
+    </div>
+
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Initialize Lucide Icons
             lucide.createIcons();
 
-            const navLinks = document.querySelectorAll('.nav-link');
-            const contentSections = document.querySelectorAll('.content-section');
-            const menuToggle = document.getElementById('menu-toggle');
-            const sidebar = document.getElementById('sidebar');
+            // --- UI Logic ---
+            const navNodes = document.querySelectorAll('.nav-node');
+            const contentOverlay = document.getElementById('content-overlay');
+            const contentCardBody = document.getElementById('card-body');
+            const closeBtn = document.getElementById('close-content-btn');
+            const splineBackground = document.getElementById('spline-background');
             
-            // 1. Navigation Logic
-            // ===================================
-            function navigateToSection(hash) {
-                contentSections.forEach(section => section.classList.remove('active'));
-                navLinks.forEach(link => link.classList.remove('active'));
-                
-                const targetSection = document.querySelector(hash);
-                if (targetSection) targetSection.classList.add('active');
-                
-                const targetLink = document.querySelector(`a[href="${hash}"]`);
-                if (targetLink) targetLink.classList.add('active');
+            const contentStore = {};
+            document.querySelectorAll('#hidden-content section').forEach(section => {
+                contentStore[`#${section.id}`] = section.innerHTML;
+            });
 
-                if (window.innerWidth < 768) {
-                    sidebar.classList.add('translate-x-full');
+            function openContent(hash) {
+                if (contentStore[hash]) {
+                    contentCardBody.innerHTML = contentStore[hash];
+                    contentOverlay.classList.add('visible');
+                    splineBackground.classList.add('blurry');
+                    lucide.createIcons();
                 }
             }
 
-            navLinks.forEach(link => {
-                link.addEventListener('click', function (e) {
+            function closeContent() {
+                contentOverlay.classList.remove('visible');
+                splineBackground.classList.remove('blurry');
+                setTimeout(() => { contentCardBody.innerHTML = ''; }, 400);
+            }
+
+            navNodes.forEach(node => {
+                node.addEventListener('click', function (e) {
                     e.preventDefault();
-                    const targetId = this.getAttribute('href');
-                    navigateToSection(targetId);
-                    history.pushState(null, null, targetId);
+                    openContent(this.getAttribute('href'));
                 });
             });
-            
-            window.addEventListener('popstate', () => {
-                const hash = window.location.hash || '#home'; // تم تغيير الافتراضي إلى #home
-                 navigateToSection(hash);
+
+            closeBtn.addEventListener('click', closeContent);
+            contentOverlay.addEventListener('click', (e) => {
+                if (e.target === contentOverlay) closeContent();
             });
-
-            // تعيين الصفحة الرئيسية كقسم افتراضي
-            const initialHash = window.location.hash || '#home'; 
-            navigateToSection(initialHash);
-
-            menuToggle.addEventListener('click', () => {
-                sidebar.classList.toggle('translate-x-full');
-            });
-
-
-            // 2. Interactive Background Logic (Original Code)
-            // ===================================
-            const canvas = document.getElementById('background-canvas');
-            const ctx = canvas.getContext('2d');
-            let stars = [];
-            let meteors = [];
-            let mouse = { x: null, y: null };
-
-            function setup() {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-                stars = [];
-                meteors = [];
-                for (let i = 0; i < 200; i++) {
-                    stars.push({
-                        x: Math.random() * canvas.width,
-                        y: Math.random() * canvas.height,
-                        radius: Math.random() * 1.5,
-                        vx: (Math.random() - 0.5) / 2,
-                        vy: (Math.random() - 0.5) / 2,
-                        opacity: Math.random() * 0.5 + 0.2
-                    });
-                }
-            }
-
-            function createMeteor() {
-                // Meteor start near the top-right and move to bottom-left
-                meteors.push({
-                    x: canvas.width + Math.random() * 200, // Start slightly off-screen right
-                    y: -10,
-                    length: Math.random() * 150 + 50,
-                    speed: Math.random() * 8 + 4 // Adjusted speed for better effect
-                });
-            }
-
-            function draw() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-                // Draw stars
-                stars.forEach(star => {
-                    star.x += star.vx;
-                    star.y += star.vy;
-                    // Wrap stars around the screen
-                    if (star.x < 0) star.x = canvas.width;
-                    if (star.x > canvas.width) star.x = 0;
-                    if (star.y < 0) star.y = canvas.height;
-                    if (star.y > canvas.height) star.y = 0;
-
-                    ctx.beginPath();
-                    ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
-                    ctx.fillStyle = `rgba(255, 255, 255, ${star.opacity})`;
-                    ctx.fill();
-                });
-
-                // Create new meteors randomly
-                if (Math.random() > 0.995) { // Less frequent
-                    createMeteor();
-                }
-
-                // Draw meteors
-                meteors.forEach((meteor, index) => {
-                    // Adjusted movement for top-right to bottom-left
-                    meteor.x -= meteor.speed * 1.5;
-                    meteor.y += meteor.speed;
-
-                    // Remove meteors that are off-screen
-                    if (meteor.y > canvas.height || meteor.x < 0) {
-                        meteors.splice(index, 1);
-                        return;
-                    }
-                    
-                    const gradient = ctx.createLinearGradient(
-                        meteor.x, meteor.y, 
-                        meteor.x + meteor.length * 0.7, meteor.y - meteor.length * 0.5 // Direction of the tail
-                    );
-                    gradient.addColorStop(0, 'rgba(255, 255, 255, 0.9)');
-                    gradient.addColorStop(0.2, 'rgba(56, 139, 253, 0.5)'); // Glow color
-                    gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
-                    
-                    ctx.beginPath();
-                    ctx.moveTo(meteor.x, meteor.y);
-                    // Draw a short line segment for the meteor head
-                    ctx.lineTo(meteor.x + 5, meteor.y - 5); 
-                    ctx.strokeStyle = gradient;
-                    ctx.lineWidth = 1;
-                    // Draw the tail part for a shooting star effect
-                    ctx.strokeStyle = `rgba(56, 139, 253, 0.8)`; // Blue tail start
-                    ctx.lineWidth = 1.5;
-                    ctx.lineTo(meteor.x + meteor.length * 0.7, meteor.y - meteor.length * 0.5);
-                    ctx.stroke();
-
-                });
-
-
-                // Draw mouse light (soft focus on content)
-                if (mouse.x && mouse.y) {
-                    const gradient = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 100); // تم تقليل الحجم إلى 100
-                    // تم تقليل الشفافية إلى 0.02 لتخفيف السطوع
-                    gradient.addColorStop(0, 'rgba(255, 255, 255, 0.02)'); 
-                    gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
-                    ctx.fillStyle = gradient;
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
-                }
-                
-                requestAnimationFrame(draw);
-            }
-
-            window.addEventListener('resize', setup);
-            window.addEventListener('mousemove', e => {
-                mouse.x = e.clientX;
-                mouse.y = e.clientY;
-            });
-            window.addEventListener('touchstart', e => {
-                if (e.touches.length > 0) {
-                    mouse.x = e.touches[0].clientX;
-                    mouse.y = e.touches[0].clientY;
-                }
-            });
-            window.addEventListener('touchmove', e => {
-                 if (e.touches.length > 0) {
-                    mouse.x = e.touches[0].clientX;
-                    mouse.y = e.touches[0].clientY;
-                }
-            });
-            window.addEventListener('touchend', () => {
-                mouse.x = null;
-                mouse.y = null;
-            });
-
-
-            setup();
-            draw();
         });
     </script>
 
 </body>
 </html>
-
-
-
-
-
-
-
-
 
